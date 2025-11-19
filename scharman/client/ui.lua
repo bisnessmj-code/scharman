@@ -21,6 +21,7 @@ function OpenMainUI()
     ClientData.MainUIOpen = true
     
     -- Demander les stats au serveur
+    LogClient("DEBUG", "Demande des stats au serveur...")
     TriggerServerEvent('scharman:server:requestStats')
     
     -- Envoyer un message à l'UI pour l'ouvrir
@@ -77,6 +78,8 @@ RegisterNetEvent('scharman:client:receiveStats', function(playerStats, globalSta
             globalStats = globalStats
         }
     })
+    
+    LogClient("INFO", "Stats envoyées à l'UI NUI")
 end)
 
 -- ════════════════════════════════════════════════════════════════════════════════
@@ -92,7 +95,7 @@ end)
 
 -- Callback : Rejoindre la salle d'attente
 RegisterNUICallback('joinWaitingRoom', function(data, cb)
-    LogClient("INFO", "Callback NUI: joinWaitingRoom")
+    LogClient("INFO", "Callback NUI: joinWaitingRoom - Début de la requête")
     
     -- Vérifier que le joueur n'est pas déjà dans un lobby
     if ClientData.InLobby or ClientData.InGame then
@@ -101,10 +104,15 @@ RegisterNUICallback('joinWaitingRoom', function(data, cb)
         return
     end
     
+    LogClient("INFO", "Envoi de la demande au serveur...")
+    
     -- Demander au serveur de rejoindre un lobby
     TriggerServerEvent('scharman:server:joinLobby')
     
-    cb({success = true})
+    -- Répondre immédiatement au NUI que la demande est envoyée
+    cb({success = true, message = "Demande envoyée au serveur"})
+    
+    LogClient("INFO", "Callback joinWaitingRoom terminé - En attente de la réponse du serveur")
 end)
 
 -- Callback : Rafraîchir les stats

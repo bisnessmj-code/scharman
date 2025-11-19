@@ -27,13 +27,23 @@ Citizen.CreateThread(function()
     LogServer("INFO", "  Version 1.0.0")
     LogServer("INFO", "════════════════════════════════════════════════════════")
     
+    -- Vérifier que MySQL est disponible
+    if not MySQL then
+        LogServer("ERROR", "❌ MySQL/oxmysql n'est pas disponible!")
+        LogServer("ERROR", "❌ Assurez-vous que oxmysql est démarré AVANT scharman")
+        return
+    end
+    
+    LogServer("INFO", "✅ MySQL/oxmysql détecté")
+    
     -- Initialiser la base de données
     InitializeDatabase()
     
     -- Attendre un peu
     Wait(1000)
     
-    LogServer("INFO", "Serveur Scharman initialisé avec succès !")
+    LogServer("INFO", "✅ Serveur Scharman initialisé avec succès !")
+    LogServer("INFO", "════════════════════════════════════════════════════════")
 end)
 
 -- ════════════════════════════════════════════════════════════════════════════════
@@ -61,31 +71,44 @@ end)
 RegisterNetEvent('scharman:server:joinLobby', function()
     local source = source
     
-    LogServer("INFO", string.format("Joueur %d veut rejoindre un lobby", source))
+    LogServer("INFO", "════════════════════════════════════════════════════════")
+    LogServer("INFO", string.format("📥 Joueur %d (%s) veut rejoindre un lobby", source, GetPlayerName(source)))
+    LogServer("INFO", "════════════════════════════════════════════════════════")
     
     -- Valider le joueur
+    LogServer("DEBUG", "Étape 1: Validation du joueur...")
     if not ValidatePlayerData(source) then
+        LogServer("ERROR", "❌ Validation du joueur échouée")
+        NotifyPlayer(source, "Erreur: Impossible de valider votre identité", "error")
         return
     end
+    LogServer("INFO", "✅ Joueur validé")
     
     -- Vérifier que le joueur n'est pas déjà dans un lobby
+    LogServer("DEBUG", "Étape 2: Vérification du statut du lobby...")
     if ServerData.PlayerLobbies[source] then
-        LogServer("WARN", string.format("Joueur %d est déjà dans un lobby", source))
+        LogServer("WARN", string.format("❌ Joueur %d est déjà dans un lobby", source))
         NotifyPlayer(source, Config.Messages.AlreadyInGame, "error")
         return
     end
+    LogServer("INFO", "✅ Joueur pas encore dans un lobby")
     
     -- Trouver ou créer un lobby
+    LogServer("DEBUG", "Étape 3: Recherche ou création d'un lobby...")
     local lobbyId = FindOrCreateLobby()
     
     if not lobbyId then
-        LogServer("ERROR", "Impossible de trouver ou créer un lobby")
-        NotifyPlayer(source, "Erreur lors de la recherche d'un lobby", "error")
+        LogServer("ERROR", "❌ Impossible de trouver ou créer un lobby")
+        NotifyPlayer(source, "Erreur: Aucun lobby disponible. Réessayez dans quelques instants.", "error")
         return
     end
+    LogServer("INFO", "✅ Lobby trouvé/créé: " .. lobbyId)
     
     -- Ajouter le joueur au lobby
+    LogServer("DEBUG", "Étape 4: Ajout du joueur au lobby...")
     AddPlayerToLobby(source, lobbyId)
+    LogServer("INFO", "✅ Joueur ajouté au lobby avec succès!")
+    LogServer("INFO", "════════════════════════════════════════════════════════")
 end)
 
 -- Event : Quitter un lobby
@@ -160,9 +183,33 @@ RegisterNetEvent('scharman:server:requestStats', function()
     
     -- Obtenir les stats
     GetPlayerStats(source, function(playerStats)
+        if not playerStats then
+            LogServer("ERROR", "Impossible de récupérer les stats du joueur " .. source)
+            -- Envoyer des stats vides
+            playerStats = {
+                matches_played = 0,
+                rounds_won = 0,
+                rounds_lost = 0,
+                kills = 0,
+                deaths = 0,
+                winrate = 0,
+                playtime_formatted = "00:00:00"
+            }
+        end
+        
         GetGlobalStats(function(globalStats)
+            if not globalStats then
+                globalStats = {
+                    total_matches = 0,
+                    total_rounds = 0,
+                    total_kills = 0,
+                    unique_players = 0
+                }
+            end
+            
             -- Envoyer les stats au client
             TriggerClientEvent('scharman:client:receiveStats', source, playerStats, globalStats)
+            LogServer("DEBUG", "Stats envoyées au joueur " .. source)
         end)
     end)
 end)
@@ -198,7 +245,7 @@ AddEventHandler('onResourceStop', function(resourceName)
     
     -- Téléporter tous les joueurs au PED
     for source, _ in pairs(ServerData.PlayerLobbies) do
-        if IsPlayerConnected(source) then
+        if GetPlayerPing(source) > 0 then
             TriggerClientEvent('scharman:client:leaveWaitingRoom', source)
         end
     end
@@ -216,11 +263,22 @@ if Config.Debug then
         print("DEBUG - Lobbys actifs")
         print("════════════════════════════════════════════════════════")
         
+        local lobbyCount = 0
         for lobbyId, lobby in pairs(ServerData.Lobbies) do
+            lobbyCount = lobbyCount + 1
             print(string.format("Lobby %s:", lobbyId))
             print(string.format("  Joueurs: %d/%d", #lobby.players, Config.Game.PlayersPerLobby))
             print(string.format("  Bucket: %d", lobby.bucket))
             print(string.format("  En jeu: %s", tostring(lobby.inGame)))
+            print("  Joueurs:")
+            for _, p in ipairs(lobby.players) do
+                print(string.format("    - %s (ID: %d, Team: %s, Ready: %s)", 
+                    p.name, p.source, tostring(p.team), tostring(p.isReady)))
+            end
+        end
+        
+        if lobbyCount == 0 then
+            print("  Aucun lobby actif")
         end
         
         print("════════════════════════════════════════════════════════")
@@ -237,7 +295,21 @@ if Config.Debug then
         end
     end, false)
     
-    LogServer("DEBUG", "Commandes admin activées: /scharman_lobbies, /scharman_force_start")
+    RegisterCommand('scharman_test_db', function(source)
+        LogServer("INFO", "Test de la connexion MySQL...")
+        
+        MySQL.Async.fetchAll('SELECT 1', {}, function(result)
+            if result then
+                LogServer("INFO", "✅ Connexion MySQL OK")
+                print("✅ La connexion à MySQL fonctionne correctement")
+            else
+                LogServer("ERROR", "❌ Connexion MySQL échouée")
+                print("❌ La connexion à MySQL a échoué")
+            end
+        end)
+    end, true)
+    
+    LogServer("DEBUG", "Commandes admin activées: /scharman_lobbies, /scharman_force_start, /scharman_test_db")
 end
 
 LogServer("INFO", "Main serveur chargé")

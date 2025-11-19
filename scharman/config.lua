@@ -17,7 +17,7 @@ Config.ScriptName = "Scharman"
 
 Config.Ped = {
     Model = "a_m_y_business_03", -- Modèle du PED
-    Coords = vector4(-270.0, -957.0, 31.2, 206.0), -- Position (x, y, z, heading)
+    Coords = vector4(-2667.019776, -767.709900, 5.993408, 345.826782), -- Position (x, y, z, heading)
     Scenario = "WORLD_HUMAN_CLIPBOARD", -- Animation du PED
     Invincible = true, -- Invincibilité
     Freeze = true, -- Bloquer les déplacements
@@ -43,7 +43,7 @@ Config.Ped = {
 
 Config.WaitingRoom = {
     -- Position de la salle d'attente
-    Coords = vector4(752.89, -1799.57, 29.55, 0.0), -- Sous-sol de Maze Bank Arena
+    Coords = vector4(-2669.723144, -778.839538, 10.475464, 348.661408), -- Sous-sol de Maze Bank Arena
     
     -- Touche pour ouvrir l'interface du lobby
     LobbyMenuKey = 288, -- F1 (288 = F1)

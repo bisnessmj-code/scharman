@@ -36,6 +36,8 @@ window.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+    console.log('✅ Interface initialisée et prête');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -44,6 +46,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
 function handleNUIMessage(event) {
     const data = event.data;
+    
+    console.log('📨 Message NUI reçu:', data.action);
     
     switch (data.action) {
         case 'openMainUI':
@@ -69,6 +73,9 @@ function handleNUIMessage(event) {
         case 'updateLobbyData':
             updateLobbyData(data.data);
             break;
+            
+        default:
+            console.warn('⚠️ Action NUI inconnue:', data.action);
     }
 }
 
@@ -173,14 +180,17 @@ function refreshStats() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function joinWaitingRoom() {
-    console.log('🎯 Rejoindre la salle d\'attente');
+    console.log('🎯 Rejoindre la salle d\'attente - Envoi de la requête...');
     
     sendNUICallback('joinWaitingRoom', {}, (response) => {
-        if (response.success) {
+        console.log('📥 Réponse reçue:', response);
+        
+        if (response && response.success) {
             console.log('✅ Demande de rejoindre acceptée');
+            // L'UI principale se fermera automatiquement via un event du serveur
         } else {
-            console.error('❌ Erreur:', response.message);
-            alert(response.message);
+            console.error('❌ Erreur:', response ? response.message : 'Pas de réponse');
+            alert(response ? response.message : 'Erreur lors de la connexion au serveur');
         }
     });
 }
@@ -301,12 +311,12 @@ function selectTeam(team) {
     console.log('🎨 Sélection de l\'équipe:', team);
     
     sendNUICallback('changeTeam', { team: team }, (response) => {
-        if (response.success) {
+        if (response && response.success) {
             console.log('✅ Équipe changée avec succès');
             UIState.currentTeam = team;
         } else {
-            console.error('❌ Erreur:', response.message);
-            alert(response.message);
+            console.error('❌ Erreur:', response ? response.message : 'Pas de réponse');
+            alert(response ? response.message : 'Erreur lors du changement d\'équipe');
         }
     });
 }
@@ -316,12 +326,12 @@ function toggleReady() {
     console.log('✅ Changement d\'état prêt:', newReadyState);
     
     sendNUICallback('toggleReady', { isReady: newReadyState }, (response) => {
-        if (response.success) {
+        if (response && response.success) {
             console.log('✅ État prêt changé avec succès');
             UIState.isReady = newReadyState;
             updateReadyButton(newReadyState);
         } else {
-            console.error('❌ Erreur:', response.message);
+            console.error('❌ Erreur:', response);
         }
     });
 }
@@ -331,7 +341,7 @@ function leaveLobby() {
     
     if (confirm('Êtes-vous sûr de vouloir quitter le lobby?')) {
         sendNUICallback('leaveLobby', {}, (response) => {
-            if (response.success) {
+            if (response && response.success) {
                 console.log('✅ Lobby quitté avec succès');
                 closeLobbyUI();
             }
@@ -346,21 +356,31 @@ function leaveLobby() {
 function sendNUICallback(action, data = {}, callback) {
     console.log('📤 Envoi callback NUI:', action, data);
     
-    fetch(`https://${GetParentResourceName()}/${action}`, {
+    const resourceName = GetParentResourceName();
+    console.log('📦 Resource name:', resourceName);
+    
+    fetch(`https://${resourceName}/${action}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📥 Réponse brute reçue:', response);
+        return response.json();
+    })
     .then(responseData => {
+        console.log('📥 Données de réponse:', responseData);
         if (callback) {
             callback(responseData);
         }
     })
     .catch(error => {
         console.error('❌ Erreur callback NUI:', error);
+        if (callback) {
+            callback({ success: false, message: error.message });
+        }
     });
 }
 
@@ -373,36 +393,15 @@ function GetParentResourceName() {
     if (window.location.hostname === 'nui-game-internal') {
         return window.location.pathname.split('/')[1];
     }
-    return 'scharman'; // Fallback pour les tests
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 🧪 MODE DEBUG (Pour tester l'interface sans FiveM)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-if (window.location.hostname !== 'nui-game-internal') {
-    console.log('🧪 Mode DEBUG activé - Interface testable dans le navigateur');
-    
-    // Simuler l'ouverture de l'UI après 1 seconde
-    setTimeout(() => {
-        openMainUI({ title: 'Scharman - Course-poursuite 2v2 [DEBUG]' });
-        
-        // Simuler des stats
-        updateStats({
-            matches_played: 42,
-            rounds_won: 85,
-            rounds_lost: 41,
-            winrate: 67,
-            kills: 156,
-            deaths: 89,
-            playtime_formatted: '12:34:56'
-        }, {
-            total_matches: 1523,
-            total_rounds: 4569,
-            total_kills: 18234,
-            unique_players: 387
-        });
-    }, 1000);
+    // Fallback pour FiveM (formats possibles)
+    if (window.location.protocol === 'https:' && window.location.hostname.includes('cfx-nui')) {
+        const path = window.location.pathname;
+        const match = path.match(/\/([^\/]+)\//);
+        if (match && match[1]) {
+            return match[1];
+        }
+    }
+    return 'scharman'; // Fallback
 }
 
 console.log('✅ Script NUI Scharman chargé avec succès!');
