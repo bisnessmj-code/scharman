@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scharman - Course-poursuite 2v2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- INTERFACE PRINCIPALE (Stats & Rejoindre) -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div id="mainUI" class="ui-container hidden">
+        <div class="ui-content">
+            <!-- Header -->
+            <div class="ui-header">
+                <h1 id="uiTitle">Scharman - Course-poursuite 2v2</h1>
+                <button class="close-btn" onclick="closeMainUI()">✕</button>
+            </div>
+
+            <!-- Navigation tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="stats">📊 Mes Stats</button>
+                <button class="tab-btn" data-tab="global">🌍 Stats Globales</button>
+                <button class="tab-btn" data-tab="join">🎮 Rejoindre</button>
+            </div>
+
+            <!-- Tab Content: Mes Stats -->
+            <div id="statsTab" class="tab-content active">
+                <h2>📊 Vos Statistiques Personnelles</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎮</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="matchesPlayed">0</span>
+                            <span class="stat-label">Parties Jouées</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="roundsWon">0</span>
+                            <span class="stat-label">Manches Gagnées</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">💔</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="roundsLost">0</span>
+                            <span class="stat-label">Manches Perdues</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="winrate">0%</span>
+                            <span class="stat-label">Winrate</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">💀</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="kills">0</span>
+                            <span class="stat-label">Kills</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">☠️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="deaths">0</span>
+                            <span class="stat-label">Morts</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="playtime">00:00:00</span>
+                            <span class="stat-label">Temps de Jeu</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">⚔️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="kd">0.00</span>
+                            <span class="stat-label">K/D Ratio</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="action-btn" onclick="refreshStats()">
+                    🔄 Rafraîchir les Stats
+                </button>
+            </div>
+
+            <!-- Tab Content: Stats Globales -->
+            <div id="globalTab" class="tab-content">
+                <h2>🌍 Statistiques Globales du Jour</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎮</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="globalMatches">0</span>
+                            <span class="stat-label">Parties Totales</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="globalRounds">0</span>
+                            <span class="stat-label">Manches Totales</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">💀</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="globalKills">0</span>
+                            <span class="stat-label">Kills Totaux</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="globalPlayers">0</span>
+                            <span class="stat-label">Joueurs Uniques</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-message">
+                    📅 Statistiques mises à jour quotidiennement
+                </div>
+            </div>
+
+            <!-- Tab Content: Rejoindre -->
+            <div id="joinTab" class="tab-content">
+                <h2>🎮 Rejoindre une Partie</h2>
+                
+                <div class="join-section">
+                    <div class="join-info">
+                        <h3>Mode de Jeu: Course-poursuite 2v2</h3>
+                        <p>Rejoignez une salle d'attente et formez votre équipe pour participer à des parties intenses de course-poursuite!</p>
+                        
+                        <ul class="features-list">
+                            <li>🚗 2 équipes de 2 joueurs</li>
+                            <li>🏁 Alternance des rôles chasseur/chassé</li>
+                            <li>⚔️ Combat tactique en zone définie</li>
+                            <li>🏆 Best of 3 manches</li>
+                        </ul>
+                    </div>
+
+                    <button class="join-btn" onclick="joinWaitingRoom()">
+                        🎯 Rejoindre la Salle d'Attente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- INTERFACE DU LOBBY (Salle d'attente) -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div id="lobbyUI" class="ui-container hidden">
+        <div class="ui-content">
+            <!-- Header -->
+            <div class="ui-header">
+                <h1>🏠 Salle d'Attente</h1>
+                <button class="close-btn" onclick="closeLobbyUI()">✕</button>
+            </div>
+
+            <!-- Lobby Info -->
+            <div class="lobby-info">
+                <div class="player-count">
+                    <span class="count" id="lobbyPlayerCount">0</span>
+                    <span class="max">/ 4</span>
+                    <span class="label">Joueurs</span>
+                </div>
+            </div>
+
+            <!-- Teams -->
+            <div class="teams-container">
+                <!-- Équipe Bleue -->
+                <div class="team blue-team">
+                    <div class="team-header">
+                        <h3>🔵 Équipe Bleue</h3>
+                        <span class="team-count" id="blueTeamCount">0/2</span>
+                    </div>
+                    <div class="team-players" id="bluePlayers">
+                        <div class="empty-slot">Slot vide</div>
+                        <div class="empty-slot">Slot vide</div>
+                    </div>
+                    <button class="team-btn blue" onclick="selectTeam('Blue')">
+                        Rejoindre l'Équipe Bleue
+                    </button>
+                </div>
+
+                <!-- Équipe Rouge -->
+                <div class="team red-team">
+                    <div class="team-header">
+                        <h3>🔴 Équipe Rouge</h3>
+                        <span class="team-count" id="redTeamCount">0/2</span>
+                    </div>
+                    <div class="team-players" id="redPlayers">
+                        <div class="empty-slot">Slot vide</div>
+                        <div class="empty-slot">Slot vide</div>
+                    </div>
+                    <button class="team-btn red" onclick="selectTeam('Red')">
+                        Rejoindre l'Équipe Rouge
+                    </button>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="lobby-actions">
+                <button class="ready-btn" id="readyBtn" onclick="toggleReady()">
+                    ✓ Je suis Prêt
+                </button>
+                <button class="leave-btn" onclick="leaveLobby()">
+                    ← Quitter le Lobby
+                </button>
+            </div>
+
+            <div class="lobby-message" id="lobbyMessage">
+                Choisissez votre équipe et préparez-vous!
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

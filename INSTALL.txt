@@ -1,0 +1,144 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                    🎮 SCHARMAN - INSTALLATION RAPIDE 🎮                        ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+📦 ÉTAPE 1 : PLACEMENT DU SCRIPT
+───────────────────────────────────────────────────────────────────────────────
+
+1. Copiez le dossier "scharman" dans votre répertoire resources :
+   
+   📂 resources/
+     └── 📂 [local]/
+         └── 📂 scharman/    ← Placez le dossier ici
+
+
+⚙️ ÉTAPE 2 : CONFIGURATION DU SERVER.CFG
+───────────────────────────────────────────────────────────────────────────────
+
+Ajoutez ces lignes dans votre server.cfg :
+
+    # Dépendance oxmysql (à démarrer AVANT scharman)
+    ensure oxmysql
+    
+    # Script Scharman
+    ensure scharman
+
+
+🗄️ ÉTAPE 3 : BASE DE DONNÉES
+───────────────────────────────────────────────────────────────────────────────
+
+Option A : Automatique (recommandé)
+   → Les tables seront créées automatiquement au premier démarrage
+   → Config.Database.AutoCreateTable est activé par défaut
+
+Option B : Manuelle
+   → Exécutez les requêtes SQL fournies dans le README.md
+
+
+🎨 ÉTAPE 4 : PERSONNALISATION (IMPORTANT)
+───────────────────────────────────────────────────────────────────────────────
+
+⚠️ VOUS DEVEZ MODIFIER CES COORDONNÉES SELON VOTRE MAP :
+
+Ouvrez le fichier : config.lua
+
+1. Position du PED d'interaction :
+   Config.Ped.Coords = vector4(-270.0, -957.0, 31.2, 206.0)
+
+2. Position de la salle d'attente :
+   Config.WaitingRoom.Coords = vector4(752.89, -1799.57, 29.55, 0.0)
+
+3. Positions de spawn des véhicules :
+   Config.VehicleSpawns.Chased.Coords = vector4(200.0, -1000.0, 29.0, 90.0)
+   Config.VehicleSpawns.Chaser.Coords = vector4(180.0, -1000.0, 29.0, 90.0)
+
+
+🚀 ÉTAPE 5 : DÉMARRAGE
+───────────────────────────────────────────────────────────────────────────────
+
+1. Démarrez/Redémarrez votre serveur FiveM
+
+2. Vérifiez les logs console, vous devriez voir :
+
+   [SCHARMAN] [INFO] ════════════════════════════════════════════════════════
+   [SCHARMAN] [INFO]   Scharman - Course-poursuite 2v2
+   [SCHARMAN] [INFO]   Version 1.0.0
+   [SCHARMAN] [INFO] ════════════════════════════════════════════════════════
+
+3. Si vous voyez des erreurs SQL, vérifiez :
+   - Que oxmysql est bien démarré
+   - Que votre base de données MySQL est accessible
+   - Les identifiants de connexion MySQL
+
+
+✅ VÉRIFICATION
+───────────────────────────────────────────────────────────────────────────────
+
+1. Connectez-vous à votre serveur
+2. Un blip "Scharman" devrait apparaître sur votre carte
+3. Rendez-vous au blip, un PED devrait être présent
+4. Appuyez sur E près du PED pour ouvrir l'interface
+5. Si tout fonctionne, l'interface s'ouvre ! 🎉
+
+
+🔧 PERSONNALISATION OPTIONNELLE
+───────────────────────────────────────────────────────────────────────────────
+
+Dans config.lua, vous pouvez modifier :
+
+• Véhicule utilisé          → Config.Vehicles.Model = "sultan2"
+• Arme par défaut           → Config.Weapons.Default.Name = "WEAPON_HEAVYSNIPER"
+• Nombre de manches         → Config.Game.MaxRounds = 3
+• Temps de recherche        → Config.Game.TimeToFindPosition = 60
+• Compte à rebours          → Config.Game.CountdownBeforeStart = 5
+• Couleurs des équipes      → Config.Teams.Blue.ColorCode
+• Et bien plus...
+
+
+🐛 DEBUG
+───────────────────────────────────────────────────────────────────────────────
+
+Si vous rencontrez des problèmes :
+
+1. Activez le mode debug dans config.lua :
+   Config.Debug = true
+
+2. Consultez les logs serveur et client (F8 dans le jeu)
+
+3. Utilisez les commandes de debug :
+   /scharman_debug         # État du client
+   /scharman_lobbies       # Liste des lobbys (admin)
+
+
+📚 DOCUMENTATION COMPLÈTE
+───────────────────────────────────────────────────────────────────────────────
+
+Pour plus de détails, consultez le fichier README.md complet qui contient :
+
+• Architecture détaillée du projet
+• Explication du système de jeu
+• Documentation de la base de données
+• FAQ et résolution de problèmes
+• Optimisations et performances
+• Et bien plus...
+
+
+🎮 BON JEU !
+───────────────────────────────────────────────────────────────────────────────
+
+Une fois installé, vos joueurs peuvent :
+
+1. Se rendre au PED Scharman (blip sur la carte)
+2. Appuyer sur E pour ouvrir l'interface
+3. Consulter leurs stats
+4. Rejoindre une partie 2v2
+5. Choisir leur équipe et se mettre prêt
+6. Jouer et s'amuser ! 🚗💨
+
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                      Développé avec ❤️ pour FiveM                              ║
+║                           Version 1.0.0 - 2025                                 ║
+╚════════════════════════════════════════════════════════════════════════════════╝
